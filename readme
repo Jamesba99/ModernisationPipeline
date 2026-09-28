@@ -21,28 +21,33 @@ In this demo, we take an enterprise Java application originally hosted on tradit
 
 ```mermaid
 flowchart TD
-    subgraph Ingestion_and_Migration [Phase 1: Ingestion & Modernization]
-        I1[1. Import WAS App Source] --> I2[2. Assess Proprietary WAS APIs & Dependencies]
-        I2 --> I3[3. Configure Liberty Maven Plugin & server.xml]
+    subgraph Ingestion["Phase 1: Ingestion and Modernization"]
+        I1["1. Import WAS App Source"] --> I2["2. Assess Proprietary WAS APIs and Dependencies"]
+        I2 --> I3["3. Configure Liberty Maven Plugin and server.xml"]
     end
 
-    subgraph CI_Pipeline [Phase 2: Build & Multi-Layer Testing]
-        I3 --> B1[Compile & Unit Tests\nmvn test]
-        B1 --> B2[Liberty Integration Tests\nmvn verify]
+    subgraph CI["Phase 2: Build and Multi-Layer Testing"]
+        I3 --> B1["Compile and Unit Tests<br/>mvn test"]
+        B1 --> B2["Liberty Integration Tests<br/>mvn verify"]
         
-        B1 --> S1[SAST Scan\nGitHub CodeQL]
-        B1 --> S2[SCA Dependency Scan\nOWASP Dependency-Check]
-        B1 --> S3[Secret Leak Scan\nGitleaks]
-        B2 --> S4[DAST Endpoint Scan\nOWASP ZAP]
+        B1 --> S1["SAST Scan<br/>GitHub CodeQL"]
+        B1 --> S2["SCA Dependency Scan<br/>OWASP Dependency-Check"]
+        B1 --> S3["Secret Leak Scan<br/>Gitleaks"]
+        B2 --> S4["DAST Endpoint Scan<br/>OWASP ZAP"]
     end
 
-    subgraph Container_and_Delivery [Phase 3: Hardened Packaging & CD]
-        B2 --> C1[Docker Build\nRed Hat UBI / Liberty Minimal]
-        C1 --> C2[Container Vulnerability Scan\nAqua Trivy SARIF]
+    subgraph CD["Phase 3: Hardened Packaging and Delivery"]
+        B2 --> C1["Docker Build<br/>Red Hat UBI / Liberty Minimal"]
+        C1 --> C2["Container Vulnerability Scan<br/>Aqua Trivy SARIF"]
         
-        S1 & S2 & S3 & S4 & C2 --> Gate{Security & Test Gate\nAll Checks Pass}
-        Gate -->|Pass| D1[Publish to Registry\nGHCR / ICR]
-        Gate -->|Fail| D2[Block Release & Alert]
+        S1 --> Gate{"Security and Test Gate<br/>All Checks Pass"}
+        S2 --> Gate
+        S3 --> Gate
+        S4 --> Gate
+        C2 --> Gate
+        
+        Gate -->|Pass| D1["Publish to Registry<br/>GHCR / ICR"]
+        Gate -->|Fail| D2["Block Release and Alert"]
     end
 ```
 
