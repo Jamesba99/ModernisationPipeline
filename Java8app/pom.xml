@@ -113,6 +113,9 @@
                 <version>3.2.5</version>
                 <configuration>
                     <useModulePath>false</useModulePath>
+                    <!-- forkCount=0 runs tests in-process, avoiding shell quoting
+                         issues when the project path contains an apostrophe. -->
+                    <forkCount>0</forkCount>
                 </configuration>
             </plugin>
 
