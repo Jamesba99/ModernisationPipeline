@@ -32,8 +32,8 @@ jobs:
       - name: Run tests
         run: mvn --batch-mode test -f Pipeline/pom.xml
 
-      # ── 5. Enforce 95% coverage gate (jacoco:check) ───────────────────────
-      - name: Enforce 95% coverage threshold
+      # ── 5. Enforce 80% coverage gate (jacoco:check) ───────────────────────
+      - name: Enforce 80% coverage threshold
         run: mvn --batch-mode jacoco:check -f Pipeline/pom.xml
 
       # ── 6. Upload JaCoCo HTML report as artefact ──────────────────────────

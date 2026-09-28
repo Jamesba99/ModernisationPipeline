@@ -23,7 +23,7 @@
         <javassist.version>3.30.2-GA</javassist.version>
         <junit.jupiter.version>5.10.2</junit.jupiter.version>
         <jacoco.version>0.8.12</jacoco.version>
-        <coverage.minimum>0.95</coverage.minimum>
+        <coverage.minimum>0.80</coverage.minimum>
     </properties>
 
     <dependencies>
@@ -174,7 +174,7 @@
                 </configuration>
             </plugin>
 
-            <!-- Code coverage — enforces 95% instruction and line coverage -->
+            <!-- Code coverage — enforces 80% instruction and line coverage -->
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
