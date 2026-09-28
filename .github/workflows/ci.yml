@@ -49,7 +49,7 @@ jobs:
       #    Scans the filesystem for HIGH and CRITICAL CVEs in dependencies.
       #    Fails the build if any are found.
       - name: Trivy vulnerability scan
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           scan-type: fs
           scan-ref: Java8app
@@ -61,7 +61,7 @@ jobs:
       # ── 8. Upload Trivy SARIF report as artefact ──────────────────────────
       - name: Trivy scan — upload SARIF report
         if: always()
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           scan-type: fs
           scan-ref: Java8app
