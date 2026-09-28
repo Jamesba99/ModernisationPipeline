@@ -58,6 +58,20 @@
             <version>1.2</version>
         </dependency>
 
+        <!-- Pin ognl to 3.4.2 to remove OgnlSecurityManager (System.setSecurityManager removed in 3.4.x) -->
+        <dependency>
+            <groupId>ognl</groupId>
+            <artifactId>ognl</artifactId>
+            <version>3.4.2</version>
+        </dependency>
+
+        <!-- Pin javassist to 3.30.2-GA to fix JEP 400 charset issue (transitive from struts2-core) -->
+        <dependency>
+            <groupId>org.javassist</groupId>
+            <artifactId>javassist</artifactId>
+            <version>3.30.2-GA</version>
+        </dependency>
+
         <!-- Logging - removed to avoid conflicts with Struts 2 built-in logging -->
     </dependencies>
 
