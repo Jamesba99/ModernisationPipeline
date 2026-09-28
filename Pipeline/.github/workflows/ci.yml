@@ -1,0 +1,79 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: ["**"]
+
+jobs:
+  build-test-scan:
+    name: Build · Test · Coverage · Vulnerability Scan
+    runs-on: ubuntu-latest
+
+    steps:
+      # ── 1. Checkout ────────────────────────────────────────────────────────
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      # ── 2. Set up Java 8 ───────────────────────────────────────────────────
+      - name: Set up JDK 8
+        uses: actions/setup-java@v4
+        with:
+          java-version: "8"
+          distribution: "temurin"
+          cache: maven
+
+      # ── 3. Build ───────────────────────────────────────────────────────────
+      - name: Build
+        run: mvn --batch-mode clean compile -f Pipeline/pom.xml
+
+      # ── 4. Unit tests + JaCoCo coverage report ────────────────────────────
+      - name: Run tests
+        run: mvn --batch-mode test -f Pipeline/pom.xml
+
+      # ── 5. Enforce 95% coverage gate (jacoco:check) ───────────────────────
+      - name: Enforce 95% coverage threshold
+        run: mvn --batch-mode jacoco:check -f Pipeline/pom.xml
+
+      # ── 6. Upload JaCoCo HTML report as artefact ──────────────────────────
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-report
+          path: Pipeline/target/site/jacoco/
+          retention-days: 14
+
+      # ── 7. OWASP dependency vulnerability scan ────────────────────────────
+      #    Fails the build when any dependency has CVSS score >= 7 (High/Critical).
+      #    Uses the NVD API key stored as a GitHub Actions secret so rate-limits
+      #    do not stall the pipeline (add NVD_API_KEY to repo Settings → Secrets).
+      - name: OWASP dependency-check
+        env:
+          NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
+        run: |
+          mvn --batch-mode org.owasp:dependency-check-maven:check \
+            -f Pipeline/pom.xml \
+            -DnvdApiKey="${NVD_API_KEY}"
+
+      # ── 8. Upload OWASP report as artefact ────────────────────────────────
+      - name: Upload vulnerability report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: owasp-report
+          path: Pipeline/target/dependency-check-report.*
+          retention-days: 14
+
+      # ── 9. Package WAR (only after all gates pass) ────────────────────────
+      - name: Package WAR
+        run: mvn --batch-mode package -DskipTests -f Pipeline/pom.xml
+
+      # ── 10. Upload WAR artefact ───────────────────────────────────────────
+      - name: Upload WAR
+        uses: actions/upload-artifact@v4
+        with:
+          name: simple-pharmacy-war
+          path: Pipeline/target/simple-pharmacy.war
+          retention-days: 14
