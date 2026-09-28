@@ -37,6 +37,38 @@
             <groupId>org.apache.struts</groupId>
             <artifactId>struts2-convention-plugin</artifactId>
             <version>${struts2.version}</version>
+            <exclusions>
+                <!-- Exclude old ASM 7.x which cannot read Java 21 (version 65) class files -->
+                <exclusion>
+                    <groupId>org.ow2.asm</groupId>
+                    <artifactId>asm</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.ow2.asm</groupId>
+                    <artifactId>asm-commons</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.ow2.asm</groupId>
+                    <artifactId>asm-tree</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <!-- ASM 9.x — replaces ASM 7.x from struts2-convention-plugin; supports Java 21 class files -->
+        <dependency>
+            <groupId>org.ow2.asm</groupId>
+            <artifactId>asm</artifactId>
+            <version>9.7.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.ow2.asm</groupId>
+            <artifactId>asm-commons</artifactId>
+            <version>9.7.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.ow2.asm</groupId>
+            <artifactId>asm-tree</artifactId>
+            <version>9.7.1</version>
         </dependency>
 
         <!-- Javassist (override transitive version to fix JDK default charset constructor issues) -->
@@ -100,8 +132,7 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.13.0</version>
                 <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
+                    <release>8</release>
                 </configuration>
             </plugin>
 
@@ -169,6 +200,17 @@
                 </executions>
             </plugin>
 
+            <!-- Liberty Maven Plugin -->
+            <plugin>
+                <groupId>io.openliberty.tools</groupId>
+                <artifactId>liberty-maven-plugin</artifactId>
+                <version>3.10.3</version>
+                <configuration>
+                    <serverName>pharmacyServer</serverName>
+                    <appsDirectory>apps</appsDirectory>
+                    <stripVersion>true</stripVersion>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 </project>
