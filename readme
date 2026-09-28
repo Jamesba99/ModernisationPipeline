@@ -1,0 +1,123 @@
+# WAS to WebSphere Liberty Replatforming & DevSecOps CI/CD Demo
+
+This repository demonstrates the end-to-end modernization and replatforming of a traditional WebSphere Application Server (WAS Traditional) workload to **IBM WebSphere Liberty / Open Liberty**, complete with a production-grade **DevSecOps CI/CD pipeline** implemented in **GitHub Actions**.
+
+---
+
+## 🎯 Demo Overview & Objectives
+
+In this demo, we take an enterprise Java application originally hosted on traditional WebSphere (WAS) and replatform it into a lightweight, container-ready WebSphere Liberty runtime. 
+
+### Key Capabilities Demonstrated:
+1. **Source Assessment & Modernization**: Evaluating proprietary WAS APIs (`com.ibm.websphere.*`), JNDI lookups, and old Java EE descriptors, mapping them to standard Jakarta EE / MicroProfile features in Liberty.
+2. **Standardized Liberty Build Harness**: Leveraging the `liberty-maven-plugin` to automate server provisioning, application deployment, and testing lifecycle directly via Maven.
+3. **Automated Continuous Integration & Testing**: Running fast unit tests (`mvn test`) and full integration tests (`mvn verify`) against an ephemeral local Liberty runtime instance.
+4. **Multi-Tier Vulnerability & Security Gates**: Embedding comprehensive DevSecOps security checks (SAST, SCA, Secret Scanning, DAST, and Container Image scanning) into the pipeline before release.
+5. **Hardened Container Packaging & Delivery**: Building minimal, compliant container images based on Red Hat UBI and WebSphere Liberty running as non-root (`USER 1001`), published to a secure container registry.
+
+---
+
+## 🏗️ Architecture & Workflow
+
+```mermaid
+flowchart TD
+    subgraph Ingestion_and_Migration [Phase 1: Ingestion & Modernization]
+        I1[1. Import WAS App Source] --> I2[2. Assess Proprietary WAS APIs & Dependencies]
+        I2 --> I3[3. Configure Liberty Maven Plugin & server.xml]
+    end
+
+    subgraph CI_Pipeline [Phase 2: Build & Multi-Layer Testing]
+        I3 --> B1[Compile & Unit Tests\nmvn test]
+        B1 --> B2[Liberty Integration Tests\nmvn verify]
+        
+        B1 --> S1[SAST Scan\nGitHub CodeQL]
+        B1 --> S2[SCA Dependency Scan\nOWASP Dependency-Check]
+        B1 --> S3[Secret Leak Scan\nGitleaks]
+        B2 --> S4[DAST Endpoint Scan\nOWASP ZAP]
+    end
+
+    subgraph Container_and_Delivery [Phase 3: Hardened Packaging & CD]
+        B2 --> C1[Docker Build\nRed Hat UBI / Liberty Minimal]
+        C1 --> C2[Container Vulnerability Scan\nAqua Trivy SARIF]
+        
+        S1 & S2 & S3 & S4 & C2 --> Gate{Security & Test Gate\nAll Checks Pass}
+        Gate -->|Pass| D1[Publish to Registry\nGHCR / ICR]
+        Gate -->|Fail| D2[Block Release & Alert]
+    end
+```
+
+---
+
+## 🛡️ Multi-Tier Vulnerability & DevSecOps Testing
+
+The pipeline enforces five distinct layers of security controls:
+
+| Security Layer | Tool | Purpose | Enforcement Gate |
+|---|---|---|---|
+| **SAST** (Static Code Analysis) | GitHub CodeQL | Detects code-level security vulnerabilities, injection flaws, and CWE patterns | Blocks on High/Critical findings |
+| **SCA** (Dependency Scanning) | OWASP Dependency-Check / Mend | Scans Maven dependencies for known CVEs | Fails build on CVSS $\ge$ 7.0 |
+| **Secret Scanning** | Gitleaks | Detects hardcoded credentials, API tokens, and private keys | Fails pipeline immediately on detection |
+| **DAST** (Dynamic API Testing) | OWASP ZAP | Automated baseline dynamic vulnerability scan against live Liberty endpoints | Alerts on OWASP Top 10 web vulnerabilities |
+| **Container Scanning** | Aqua Trivy | Scans container OS layers and runtime binaries for vulnerabilities | SARIF report upload to GitHub Security tab; blocks critical CVEs |
+
+---
+
+## 📋 Implementation Plan & Milestones
+
+### Sub-Task 1: WAS Application Ingestion & Migration Assessment
+- **Goal**: Import existing WAS application source, identify proprietary dependencies, and map runtime requirements.
+- **Deliverables**:
+  - Imported Java source, `web.xml`, and build descriptor.
+  - Inventory of required Liberty features (e.g., `servlet-6.0`, `cdi-4.0`, `jdbc-4.3`, `restfulWS-3.1`).
+- **Status**: `[ ] pending`
+
+### Sub-Task 2: Repository Structure & Liberty Maven Baseline
+- **Goal**: Establish Maven configuration with `liberty-maven-plugin` and standard Liberty directory layout.
+- **Deliverables**:
+  - `pom.xml` with Liberty plugin lifecycle goals and `dependency-check-maven` profile.
+  - Tailored `src/main/liberty/config/server.xml` with discovered features and datasource configurations.
+  - `.gitignore` safeguarding secrets, `target/`, and runtime `wlp/` directories.
+- **Status**: `[ ] pending`
+
+### Sub-Task 3: Build & Automated Testing Workflow
+- **Goal**: Automate unit and Liberty integration testing in GitHub Actions.
+- **Deliverables**:
+  - `.github/workflows/ci.yml` matrix runner with Java 17/21.
+  - Maven caching for optimized execution.
+  - Automated `mvn clean verify` executing tests against live local Liberty instances with surefire/failsafe report uploads.
+- **Status**: `[ ] pending`
+
+### Sub-Task 4: Multi-Tier Vulnerability & Security Testing Suite
+- **Goal**: Integrate DevSecOps automated scans into GitHub Actions workflows.
+- **Deliverables**:
+  - `.github/workflows/codeql.yml` for automated Java SAST.
+  - Dependency vulnerability scan job generating SARIF alerts.
+  - Gitleaks step for secret leak detection.
+  - OWASP ZAP baseline DAST scan against active Liberty server endpoints.
+- **Status**: `[ ] pending`
+
+### Sub-Task 5: Hardened Containerization & Image Vulnerability Scanning
+- **Goal**: Create an enterprise-grade `Dockerfile` and scan container layers.
+- **Deliverables**:
+  - Multi-stage `Dockerfile` based on Red Hat UBI / Liberty minimal image, running as non-root (`USER 1001`) with `RUN configure.sh`.
+  - `.github/workflows/container-build.yml` executing Trivy container vulnerability scan and uploading SARIF results.
+- **Status**: `[ ] pending`
+
+### Sub-Task 6: Image Registry Publishing & Release Gates (CD)
+- **Goal**: Publish scanned and approved container images to a registry.
+- **Deliverables**:
+  - Image publication to GitHub Container Registry (GHCR) or IBM Cloud Container Registry (ICR).
+  - Version tagging based on Git commit SHA and semantic release tags.
+- **Status**: `[ ] pending`
+
+---
+
+## 🚀 Getting Started
+
+1. Place or clone your WAS application source code into the workspace.
+2. Review and adjust feature definitions in [`src/main/liberty/config/server.xml`](src/main/liberty/config/server.xml).
+3. Run local verification:
+   ```bash
+   mvn clean verify
+   ```
+4. Push to GitHub to trigger the automated CI/CD and vulnerability scanning pipeline.
