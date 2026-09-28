@@ -10,6 +10,8 @@ jobs:
   build-test-scan:
     name: Build · Test · Coverage · Vulnerability Scan
     runs-on: ubuntu-latest
+    env:
+      NODE_OPTIONS: "--no-deprecation"
 
     steps:
       # ── 1. Checkout ────────────────────────────────────────────────────────
