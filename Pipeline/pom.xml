@@ -20,6 +20,7 @@
         <struts2.version>2.5.30</struts2.version>
         <junit.jupiter.version>5.10.2</junit.jupiter.version>
         <jacoco.version>0.8.12</jacoco.version>
+        <owasp.version>10.0.2</owasp.version>
         <coverage.minimum>0.95</coverage.minimum>
     </properties>
 
@@ -158,6 +159,25 @@
                 </executions>
             </plugin>
 
+            <!-- OWASP dependency vulnerability scan — fails on CVSS >= 7 (High/Critical) -->
+            <plugin>
+                <groupId>org.owasp</groupId>
+                <artifactId>dependency-check-maven</artifactId>
+                <version>${owasp.version}</version>
+                <configuration>
+                    <failBuildOnCVSS>7</failBuildOnCVSS>
+                    <suppressionFile>${project.basedir}/.owasp-suppressions.xml</suppressionFile>
+                    <formats>
+                        <format>HTML</format>
+                        <format>JSON</format>
+                    </formats>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals><goal>check</goal></goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 </project>
