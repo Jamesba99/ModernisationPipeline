@@ -29,8 +29,8 @@ jobs:
         run: mvn --batch-mode clean compile -f Pipeline/pom.xml
 
       # ── 4. Unit tests + JaCoCo coverage report ────────────────────────────
-      - name: Run tests
-        run: mvn --batch-mode test -f Pipeline/pom.xml
+      - name: Run tests & generate JaCoCo report
+        run: mvn --batch-mode test jacoco:report -f Pipeline/pom.xml
 
       # ── 5. Enforce 80% coverage gate (jacoco:check) ───────────────────────
       - name: Enforce 80% coverage threshold
@@ -44,6 +44,7 @@ jobs:
           name: jacoco-report
           path: Pipeline/target/site/jacoco/
           retention-days: 14
+          if-no-files-found: ignore
 
       # ── 7. OWASP dependency vulnerability scan ────────────────────────────
       #    Fails the build when any dependency has CVSS score >= 7 (High/Critical).

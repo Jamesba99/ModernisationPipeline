@@ -31,8 +31,8 @@ jobs:
         run: mvn --batch-mode clean compile -f Java8app/pom.xml
 
       # ── 4. Unit tests + JaCoCo coverage report ────────────────────────────
-      - name: Run tests
-        run: mvn --batch-mode test -f Java8app/pom.xml
+      - name: Run tests & generate JaCoCo report
+        run: mvn --batch-mode test jacoco:report -f Java8app/pom.xml
 
       # ── 5. Enforce 80% coverage gate (jacoco:check) ───────────────────────
       - name: Enforce 80% coverage threshold
@@ -46,6 +46,7 @@ jobs:
           name: jacoco-report
           path: Java8app/target/site/jacoco/
           retention-days: 14
+          if-no-files-found: ignore
 
       # ── 7. Trivy vulnerability scan (open-source, no API key needed) ───────
       #    Scans the filesystem for HIGH and CRITICAL CVEs in dependencies.
